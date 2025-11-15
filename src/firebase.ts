@@ -1,0 +1,23 @@
+import admin from "firebase-admin";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+const projectId = process.env.FIREBASE_PROJECT_ID;
+
+if (!privateKey || !clientEmail || !projectId) {
+  throw new Error("Faltan variables de entorno de Firebase Admin.");
+}
+
+admin.initializeApp({
+  credential: admin.credential.cert({
+    projectId,
+    clientEmail,
+    privateKey: privateKey.replace(/\\n/g, "\n"),
+  }),
+});
+
+export const db = admin.firestore();
+export const auth = admin.auth();
