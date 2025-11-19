@@ -3,31 +3,48 @@ import UserService from "../services/UserService.js";
 
 const router = Router();
 
-router.put("/:uid", async (req, res) => {
+// GET /users/me - Perfil usuario (US-4)
+router.get("/me", async (req, res) => {
     try {
-        const { uid } = req.params;
-        const data = req.body;
+        const userId = req.headers.userid as string; // Frontend enviará userID
+        const user = await UserService.getUser(userId);
+        
+        if (!user) {
+            return res.status(404).json({ error: "Usuario no encontrado" });
+        }
 
-        await UserService.updateUser(uid, data);
-
-        res.json({ message: "Usuario actualizado" });
-    } catch (e: any) {
-        res.status(400).json({ error: e.message });
+        res.json({
+            id: user.uid,
+            firstName: user.firstName,
+            lastName: user.lastName, 
+            age: user.age,
+            email: user.email,
+            createdAt: user.createdAt
+        });
+    } catch (error) {
+        res.status(500).json({ error: "Error interno del servidor" });
     }
 });
 
-router.get("/:uid", async (req, res) => {
+// PUT /users/me - Editar perfil (US-5)  
+router.put("/me", async (req, res) => {
     try {
-        const { uid } = req.params;
-        const user = await UserService.getUser(uid);
-        res.json(user);
-    } catch (err: any) {
-        res.status(400).json({ error: err.message });
+        const userId = req.headers.userid as string; // Frontend enviará userID
+        const { firstName, lastName, age, email } = req.body;
+
+        // Validación básica
+        if (!firstName || !lastName || !age || !email) {
+            return res.status(400).json({ error: "Todos los campos son requeridos" });
+        }
+
+        const result = await UserService.updateUser(userId, req.body);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: "Error interno del servidor" });
     }
 });
 
-
-
+// DELETE /users/:uid - Eliminar cuenta (US-6)
 router.delete("/:uid", async (req, res) => {
     const { uid } = req.params;
     const result = await UserService.deleteUser(uid);
