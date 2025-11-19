@@ -23,13 +23,37 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  const { idToken } = req.body;
+  const { email, password } = req.body;
 
   try {
-    const decoded = await auth.verifyIdToken(idToken);
-    res.json({ uid: decoded.uid });
-  } catch {
-    res.status(401).json({ error: "Token inválido" });
+    // Configuración temporal para Firebase Client
+    const { initializeApp } = await import('firebase/app');
+    const { getAuth, signInWithEmailAndPassword } = await import('firebase/auth');
+    
+    const firebaseConfig = {
+      apiKey: process.env.FIREBASE_API_KEY,
+      authDomain: process.env.FIREBASE_AUTH_DOMAIN
+    };
+
+    const clientApp = initializeApp(firebaseConfig, "client");
+    const clientAuth = getAuth(clientApp);
+
+    // Hacer login con email/password
+    const userCredential = await signInWithEmailAndPassword(clientAuth, email, password);
+    const user = userCredential.user;
+    const idToken = await user.getIdToken();
+
+    res.json({
+      uid: user.uid,
+      email: user.email,
+      idToken: idToken
+    });
+  } catch (error: any) {
+    if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+      res.status(401).json({ error: "Correo o contraseña inválidos" });
+    } else {
+      res.status(500).json({ error: error.message });
+    }
   }
 });
 
