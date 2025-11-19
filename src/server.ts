@@ -30,7 +30,8 @@ const app = express();
  */
 const allowedOrigins = [
   "http://localhost:5175",
-  "https://roomio-frontend-71odq4upu-johanandrescts-projects.vercel.app"
+  "https://roomio-frontend-71odq4upu-johanandrescts-projects.vercel.app",
+  process.env.FRONTEND_URL
 ];
 
 /**
