@@ -10,7 +10,7 @@ class MeetingDAO {
 
     async getMeetingsByUser(userId: string) {
         const snap = await this.collection.where("userId", "==", userId).get();
-        return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        return snap.docs.map((doc: { id: any; data: () => any; }) => ({ id: doc.id, ...doc.data() }));
     }
 
     async createMeeting(data: any) {
