@@ -4,6 +4,8 @@ import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/users.js";
 import meetingRoutes from "./routes/meetings.js";
 import dotenv from "dotenv";
+import { verifyToken } from "./middleware/authMiddleware.js";
+
 
 dotenv.config(); // ← Mover esto ANTES de usar process.env
 
@@ -36,8 +38,9 @@ app.use(express.json());
 
 // 3. Rutas (DESPUÉS de CORS y JSON parser)
 app.use("/auth", authRoutes);
-app.use("/users", userRoutes);
-app.use("/meetings", meetingRoutes);
+app.use("/users", verifyToken, userRoutes);
+app.use("/meetings", verifyToken, meetingRoutes);
+
 
 app.get("/", (_, res) => res.send("Backend Sprint 1 funcionando"));
 
