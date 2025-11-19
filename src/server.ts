@@ -5,24 +5,39 @@ import userRoutes from "./routes/users.js";
 import meetingRoutes from "./routes/meetings.js";
 import dotenv from "dotenv";
 
-const PORT = process.env.PORT || 5000;
+dotenv.config(); // ← Mover esto ANTES de usar process.env
 
-dotenv.config();
+const PORT = process.env.PORT || 5000;
 
 const app = express();
 
+// 1. CORS primero (ANTES de las rutas)
+const allowedOrigins = [
+  "http://localhost:5175",
+  "https://roomio-frontend-71odq4upu-johanandrescts-projects.vercel.app"
+];
 
+app.use(cors({
+  origin: (origin, callback) => {
+    // Permitir requests sin origin (como Postman, mobile apps, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
+
+// 2. JSON parser
 app.use(express.json());
 
-// 2. Rutas
+// 3. Rutas (DESPUÉS de CORS y JSON parser)
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/meetings", meetingRoutes);
-
-// 3. CORS (después de las rutas)
-app.use(cors({
-  origin: process.env.FRONTEND_URL
-}));
 
 app.get("/", (_, res) => res.send("Backend Sprint 1 funcionando"));
 
