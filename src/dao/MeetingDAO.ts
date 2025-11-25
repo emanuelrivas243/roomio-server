@@ -49,8 +49,9 @@ class MeetingDAO {
         }
 
         await this.collection.doc(meetingId).set({
-            ...data,
             meetingId,
+            meetingName: data.title,
+            meetingDate: data.scheduledAt,
             createdAt: new Date(),
             updatedAt: new Date(),
         });
