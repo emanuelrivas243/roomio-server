@@ -10,6 +10,7 @@ import userRoutes from "./routes/users.js";
 import meetingRoutes from "./routes/meetings.js";
 import dotenv from "dotenv";
 import { verifyToken } from "./middleware/authMiddleware.js";
+import messageRoutes from "./routes/messages.js";
 
 // Load environment variables BEFORE accessing process.env
 dotenv.config();
@@ -80,6 +81,8 @@ app.use("/users", verifyToken, userRoutes);
  * Protected with verifyToken middleware.
  */
 app.use("/meetings", verifyToken, meetingRoutes);
+
+app.use("/messages", verifyToken, messageRoutes);
 
 /**
  * Root endpoint.

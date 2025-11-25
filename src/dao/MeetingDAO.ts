@@ -1,5 +1,6 @@
 import { db } from "../firebase.js";
 import { generateMeetingId } from "../utils/generateMeetingId.js";
+import MessageDAO from "../dao/MessageDAO.js";
 
 /**
  * Data Access Object (DAO) for handling CRUD operations
@@ -78,9 +79,12 @@ class MeetingDAO {
      * @returns {Promise<{id: string}>} The ID of the deleted meeting.
      */
     async deleteMeeting(id: string) {
+        await MessageDAO.deleteAllMessages(id);
         await this.collection.doc(id).delete();
+
         return { id };
     }
+
 }
 
 export default new MeetingDAO();
