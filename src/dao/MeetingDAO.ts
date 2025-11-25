@@ -47,7 +47,7 @@ class MeetingDAO {
             else meetingId = generateMeetingId();
         }
 
-        await this.collection.add({
+        await this.collection.doc(meetingId).set({
             ...data,
             meetingId,
             createdAt: new Date(),
