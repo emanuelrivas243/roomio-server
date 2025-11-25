@@ -1,4 +1,5 @@
 import { db } from "../firebase.js";
+import { generateMeetingId } from "../utils/generateMeetingId.js";
 
 /**
  * Data Access Object (DAO) for handling CRUD operations
@@ -14,7 +15,7 @@ class MeetingDAO {
      * @param {string} id - The ID of the meeting to retrieve.
      * @returns {Promise<object|null>} The meeting data if found, otherwise null.
      */
-    async getMeeting(id:string) {
+    async getMeeting(id: string) {
         const snap = await this.collection.doc(id).get();
         return snap.exists ? snap.data() : null;
     }
@@ -27,7 +28,7 @@ class MeetingDAO {
      */
     async getMeetingsByUser(userId: string) {
         const snap = await this.collection.where("userId", "==", userId).get();
-        return snap.docs.map((doc: {id: any; data: () => any;}) => ({ id: doc.id, ...doc.data() }));
+        return snap.docs.map((doc: { id: any; data: () => any; }) => ({ id: doc.id, ...doc.data() }));
     }
 
     /**
@@ -36,13 +37,23 @@ class MeetingDAO {
      * @param {any} data - The meeting data to store. Should include at least userId and title.
      * @returns {Promise<{id: string}>} The ID of the newly created meeting document.
      */
-    async createMeeting(data:any) {
-        const docRef = await this.collection.add({
+    async createMeeting(data: any) {
+        let meetingId = generateMeetingId();
+
+        let exists = true;
+        while (exists) {
+            const snap = await this.collection.doc(meetingId).get();
+            if (!snap.exists) exists = false;
+            else meetingId = generateMeetingId();
+        }
+
+        await this.collection.add({
             ...data,
+            meetingId,
             createdAt: new Date(),
             updatedAt: new Date(),
         });
-        return { id: docRef.id };
+        return { id: meetingId };
     }
 
     /**
@@ -66,7 +77,7 @@ class MeetingDAO {
      * @param {string} id - The ID of the meeting to delete.
      * @returns {Promise<{id: string}>} The ID of the deleted meeting.
      */
-    async deleteMeeting(id:string) {
+    async deleteMeeting(id: string) {
         await this.collection.doc(id).delete();
         return { id };
     }
