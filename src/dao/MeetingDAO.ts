@@ -1,6 +1,6 @@
+import MessageDAO from "../dao/MessageDAO.js";
 import { db } from "../firebase.js";
 import { generateMeetingId } from "../utils/generateMeetingId.js";
-import MessageDAO from "../dao/MessageDAO.js";
 
 /**
  * Data Access Object (DAO) for handling CRUD operations
@@ -66,8 +66,12 @@ class MeetingDAO {
      * @returns {Promise<{id: string}>} The ID of the updated meeting.
      */
     async updateMeeting(id: string, data: any) {
+        const cleanData = Object.fromEntries(
+            Object.entries(data).filter(([_, value]) => value !== undefined)
+        );
+
         await this.collection.doc(id).update({
-            ...data,
+            ...cleanData,
             updatedAt: new Date(),
         });
         return { id };

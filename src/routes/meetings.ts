@@ -61,4 +61,21 @@ router.delete("/:id", async (req, res) => {
     res.json(result);
 });
 
+/**
+ * @route POST /meetings/:roomId/video-link
+ * @description Add video server URL to an existing meeting.
+ *
+ * @param {string} req.params.roomId - The ID of the meeting.
+ * @returns {Object} 200 - Updated meeting data.
+ *
+ * @example
+ * POST /meetings/test-room/video-link
+ */
+router.post("/:roomId/video-link", async (req, res) => {
+    const { roomId } = req.params;
+    const videoUrl = process.env.VIDEO_SERVER_URL || 'ws://localhost:5003';
+    const result = await MeetingService.updateMeetingVideoLink(roomId, videoUrl);
+    res.json(result);
+});
+
 export default router;

@@ -59,6 +59,19 @@ class MeetingService {
     deleteMeeting(id: string) {
         return MeetingDAO.deleteMeeting(id);
     }
+
+    // Método para actualizar el enlace de video en una reunión existente.
+    /**
+     * Updates the video server URL for an existing meeting.
+     * 
+     * @param {string} roomId - The ID of the meeting to update.
+     * @param {string} videoUrl - The video server URL to set.
+     * @returns {Promise<any>} The updated meeting record.
+     */
+    updateMeetingVideoLink(roomId: string, videoUrl: string) {
+        return this.updateMeeting(roomId, { videoServerUrl: videoUrl });
+    }
+    
 }
 
 export default new MeetingService();
